@@ -1,9 +1,11 @@
 # Tema 4. Práctica
 
+
 ## Índice
 1. [Enunciado](#punto1)
 2. [Resolución](#punto2)
 3. [Anotaciones](#punto3)
+4. [Diagrama UML](#punto4)
 
 
 <br><div id="punto1"></div>
@@ -76,7 +78,7 @@ Partiendo de la solución del ejercicio 11 de esta unidad, _abstract factory pat
 <div id="punto2"></div>
 
 ## 2. Resolución
-Primero configuraremos la clase _GameController_ para que siga el patrón _Singleton_, cuya estructura UML es la siguiente (hemos omitido algunos métodos por cuestiones de espacio, en el repositorio están los resultados completos):
+Primero configuraremos la clase _GameController_ para que siga el patrón _Singleton_, cuya estructura UML es la siguiente (se han omitido algunos métodos por cuestiones de espacio, en el repositorio están los resultados completos):
 ```mermaid
 %%{init: {'theme':'dark'}}%%
 
@@ -219,7 +221,7 @@ System.out.println("Witches ("+ (this.getProbabilidadWitch() * 100) +"%)");
 Daemons (50.0%), Witches (50.0%)
 ```
 
-Es decir, si cambio ahora de mundo al 2, y llamo de nuevo a la línea o al método _getProbabilidadWitch_ o _getProbabilidadDaemon_ indistintamente, el resultado será distinto, aún siendo fábricas diferentes:
+Es decir, si cambio ahora de mundo al 2, y llamo de nuevo a la línea o al método _getProbabilidadWitch_ o _getProbabilidadDaemon_ indistintamente, el resultado será diferente, aún siendo fábricas diferentes:
 ```java
 this.setEnemyAbstractFactory(new World2AbstractFactory());
 System.out.print("Daemons ("+ (this.getProbabilidadDaemon() * 100) +"%), ");
@@ -254,11 +256,211 @@ crearDaemon = Generador.generarPorDebajo(this.getProbabilidadDaemon());
 if(crearDaemon) System.out.println(this.createDaemon());
 else System.out.println(this.createWitch());
 ```
-> La variable _crearDaemon_ no aparece iniciada en este fragmento, pero se inicia cuando se dan los datos del mundo 1
+> La variable _crearDaemon_ se inicia antes, aunque no aparece en el fragmento
+
+```
+Empieza el juego en el Mundo 1
+Creamos un demonio en el mundo 1  com.juangv.worlds.World1Daemon [name=com.juangv.products.Daemon, power=10, lives=1, color=rojo]
+Creamos una bruja en el mundo 1  com.juangv.worlds.World1Witch [name=com.juangv.products.Witch, power=15, lives=2, magicPower=Magic wand]
+Cambiamos de mundo, pasamos al mundo 2
+Creamos un demonio en el mundo 2  com.juangv.worlds.World2Daemon [name=Big com.juangv.products.Daemon, power=20, lives=2, color=verde]
+Creamos una bruja en el mundo 2  com.juangv.worlds.World2Witch [name=Big com.juangv.products.Witch, power=30, lives=4, magicPower=Magic wand and magic broom]
+Reiniciamos, pasamos al mundo 1
+Daemons (50.0%), Witches (50.0%)
+Ejemplo de enemigo aleatorio en el Mundo1
+ com.juangv.worlds.World1Daemon [name=com.juangv.products.Daemon, power=10, lives=1, color=rojo]
+Daemons (25.0%), Witches (75.0%)
+Ejemplo de enemigo aleatorio en el Mundo2
+ com.juangv.worlds.World2Witch [name=Big com.juangv.products.Witch, power=30, lives=4, magicPower=Magic wand and magic broom]
+Juego finalizado
+```
+
 
 
 <br><div id="punto3"></div>
 
 ## 3. Anotaciones
-- La instanciación perezosa crea una instancia solo cuando es necesaria
-- Los resultados de este proyecto y código completo se encuentran en el siguiente enlace de [GitHub](https://github.com/JuanGomezVilla/AbstractFactoryPattern) 
+- La instanciación perezosa crea una instancia cuando se necesita, antes no.
+- Existen formas alternativas de realizar este ejercicio, incluso por medio de clases abstractas en lugar de interfaces.
+- Los resultados de este proyecto y código completo se encuentran en el siguiente enlace de [GitHub](https://github.com/JuanGomezVilla/AbstractFactoryPattern)
+
+<br><div class="page"></div><!-- PDF EXPORT -->
+
+<div id="punto4"></div>
+
+## 4. Diagrama UML
+<!--
+
+&gt;
+&lt;
+
+-->
+
+```mermaid
+%%{init: {'theme':'dark'}}%%
+
+
+classDiagram
+    direction TB
+
+    EnemyAbstractFactory <|.. World1AbstractFactory
+    EnemyAbstractFactory <|.. World2AbstractFactory
+
+    Enemy <|-- Daemon
+    Enemy <|-- Witch
+    Daemon <|.. World1Daemon
+    Daemon <|.. World2Daemon
+    Witch <|.. World1Witch
+    Witch <|.. World2Witch
+
+    DaemonGameTest ..> GameController
+    Generador <.. GameController
+
+    EnemyAbstractFactory ..> Witch
+    EnemyAbstractFactory ..> Daemon
+    EnemyAbstractFactory --* GameController
+
+    class Generador {
+        <<utility>>
+        + generarPorDebajo(probabilidad : double) boolean
+    }
+
+    class World {
+        <<enumeration>>
+        LEVEL1
+        LEVEL2
+    }
+
+    class DaemonGameTest {
+        + main() void
+    }
+
+    class Enemy {
+        <<interface>>
+        getLives() Integer
+        getPower() Integer
+        getName() String
+    }
+
+    class Daemon {
+        <<interface>>
+        getColor() String
+    }
+
+    class Witch {
+        &lt;&lt;interface>>
+        getMagicPower() : String
+    }
+
+    class World1Daemon {
+        - color : String
+        - lives : Integer
+        - power : Integer
+        - name : String
+        + COLOR_POR_DEFECTO : String
+        + getName() String
+        + getPower() Integer
+        + getLives() Lives
+        + getColor() String
+        + setName(name: String) void
+        + setPower(power: Integer) void
+        + setLives(lives: Integer) void
+        + setColor(color: String) void
+        + World1Daemon(name: String)
+        + World1Daemon(name: String, color: String)
+        + toString() String
+    }
+
+    class World2Daemon {
+        - color : String
+        - lives : Integer
+        - power : Integer
+        - name : String
+        + COLOR_POR_DEFECTO : String
+        + getName() String
+        + getPower() Integer
+        + getLives() Lives
+        + getColor() String
+        + setName(name: String) void
+        + setPower(power: Integer) void
+        + setLives(lives: Integer) void
+        + setColor(color: String) void
+        + World2Daemon(name: String)
+        + World2Daemon(name: String, color: String)
+        + toString() String
+    }
+
+    class World1Witch {
+        - magicPower : String
+        - lives : Integer
+        - power : Integer
+        - name : String
+        + MAGIC_POWER_POR_DEFECTO : String
+        + getName() String
+        + getPower() Integer
+        + getLives() Lives
+        + getMagicPower() String
+        + setName(name: String) void
+        + setPower(power: Integer) void
+        + setLives(lives: Integer) void
+        + setMagicPower(magicPower: String) void
+        + World1Witch(name: String)
+        + World1Witch(name: String, magicPower: String)
+        + toString() String
+    }
+
+        class World2Witch {
+        - magicPower : String
+        - lives : Integer
+        - power : Integer
+        - name : String
+        + MAGIC_POWER_POR_DEFECTO : String
+        + getName() String
+        + getPower() Integer
+        + getLives() Lives
+        + getMagicPower() String
+        + setName(name: String) void
+        + setPower(power: Integer) void
+        + setLives(lives: Integer) void
+        + setMagicPower(magicPower: String) void
+        + World2Witch(name: String)
+        + World2Witch(name: String, magicPower: String)
+        + toString() String
+    }
+
+    class GameController {
+        - enemyAbstractFactory : EnemyAbstractFactory
+        - gameController : GameController
+        - GameController()
+        + getInstance() GameController
+        + getEnemyAbstractFactory() EnemyAbstractFactory
+        + setEnemyAbstractFactory(enemyAbstractFactory : EnemyAbstractFactory) void
+        + createDaemon() Daemon
+        + createWitch() Witch
+        + getProbabilidadDaemon() double
+        + getProbabilidadWitch() double
+        + play() void
+    }
+
+    class EnemyAbstractFactory {
+        &lt;&lt;interface&gt;&gt;
+        + getProbabilidadWitch() double
+        + getProbabilidadDaemon() double
+        + createWitch() Witch
+        + createDaemon() Daemon
+    }
+
+    class World1AbstractFactory {
+        + getProbabilidadDaemon() double
+        + getProbabilidadWitch() double
+        + createDaemon() Daemon
+        + createWitch() Witch
+    }
+
+    class World2AbstractFactory {
+        + getProbabilidadDaemon() double
+        + getProbabilidadWitch() double
+        + createDaemon() Daemon
+        + createWitch() Witch
+    }
+```
